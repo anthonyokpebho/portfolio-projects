@@ -2,7 +2,7 @@ import pygame,random,time,pyautogui
 pygame.init()
 font1=pygame.font.SysFont("Impact",25)
 font2=pygame.font.SysFont("Impact",50)
-Gamestate="play"
+Gamestate="start"
 w,h=pyautogui.size()
 sc=pygame.display.set_mode((w,h))
 pygame.display.set_caption("2 Player Games")
@@ -61,11 +61,14 @@ def handlebullets(rbullets,rrect,bbullets,brect,rhealth,bhealth):
         if o.colliderect(rrect):
             bbullets.remove(o)
             rhealth-=1
-    for i in rrect:
-        if i.colliderect(brect):
-            rrect=pygame.Rect(w-100,h/2,shipw,shiph)
-            brect=pygame.Rect(50,h/2,shipw,shiph)
 
+    if rrect.colliderect(brect):
+        rrect.x=w-100
+        rrect.y=h/2
+        brect.x=50
+        brect.y=h/2
+        rhealth-1
+        bhealth-1
 
 
 
@@ -75,17 +78,17 @@ def handlebullets(rbullets,rrect,bbullets,brect,rhealth,bhealth):
 def output(rrect,brect,rbullets,bbullets,rhealth,bhealth,winner):
     if Gamestate=="start":
         sc.blit(bck,(0,0))
-        sc.blit(rship1,(rship1.x,rship1.y))
-        sc.blit(bship1,(bship1.x,bship1.y))
+        sc.blit(rship1,(100,100))
+        sc.blit(bship1,(w-200,h-200))
         text1=font1.render("This is two player games",True,"White")
         text2=font2.render("For the red player use the arrow keys to control the ship and the right shift key to shoot",True,"Red")
         text3=font2.render("For the blue player use the WASD keys to control the ship and the left shift key to shoot",True,"Blue")
         text4=font1.render("Good Luck",True,"Green")
         sc.blit(text1,(0,h/3))
-        sc.blit(text2,(0,h/3))
-        sc.blit(text3,(0,h/3))
-        sc.blit(text4,(0,h/3))
-
+        sc.blit(text2,(0,h/3+100))
+        sc.blit(text3,(0,h/3+200))
+        sc.blit(text4,(0,h/3+300))
+    
     elif Gamestate=="play":
         sc.blit(bck,(0,0))
         sc.blit(p1,(rrect.x,rrect.y))
@@ -123,8 +126,8 @@ def m():
                 if e.key==pygame.K_LSHIFT and Gamestate=="play":
                     bullet2=pygame.Rect(brect.x+rrect.width,brect.y+brect.height/2,20,10)
                     bbullets.append(bullet2)
-                if e.key==pygame.K_SPACE and Gamestate=="end" or "start":
-                    Gamestate=="play"
+                if e.key==pygame.K_SPACE and (Gamestate=="end" or Gamestate=="start"):
+                    Gamestate="play"
                     rhealth,bhealth=10,10
         
         if Gamestate=="play":
@@ -133,10 +136,11 @@ def m():
             if bhealth<=0:
                 winner="Red wins the game"
             if winner:
-                Gamestate=="end"
+                Gamestate="end"
         output(rrect,brect,rbullets,bbullets,rhealth,bhealth,winner)
         keypressed=pygame.key.get_pressed()
         handleships(rrect,brect,keypressed)
         handlebullets(rbullets,rrect,bbullets,brect,rhealth,bhealth)
         pygame.display.update()
 
+m()
